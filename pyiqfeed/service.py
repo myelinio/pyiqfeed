@@ -133,7 +133,7 @@ class FeedService:
         iqfeed_args = ("-product %s -version %s -login %s -password %s -autoconnect -savelogininfo" %
                        (self.product, self.version, self.login, self.password))
 
-        if not _is_iqfeed_running():
+        if not _is_iqfeed_running(self.iqfeed_host, self.iqfeed_ports):
             if sys.platform == 'win32':
                 # noinspection PyPep8Naming
                 ShellExecute = __import__('win32api').ShellExecute

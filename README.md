@@ -33,7 +33,9 @@ that can launch the IQFeed service on a windows, OSX or Linux
 machine (so long as IQFeed has been installed using a recent version of
 Wine if you aren't on Windows).
 
-If you are installing on OSX, install Wine or Wine-Devel using one of
+MacOS Catalina dropped support of 32-bit applications, 
+so wine can't be used there. If you are using macOS 10.14 or lower, 
+install Wine or Wine-Devel using one of
 Homebrew, Macports, or Fink and then install IQFeed inside that. The
 Mac Download of IQFeed is basically just a CodeWeavers Wine "bottled"
 version of IQFeed, not a native Mac version and because it's been
