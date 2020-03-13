@@ -3114,7 +3114,8 @@ class BarConn(FeedConn):
     port = FeedConn.deriv_port
 
     interval_data_type = np.dtype(
-            [('symbol', 'S64'), ('date', 'M8[D]'), ('time', 'u8'),
+            [('request_id', 'S64'), ('symbol', 'S64'),
+             ('date', 'M8[D]'), ('time', 'u8'),
              ('open_p', 'f8'), ('high_p', 'f8'), ('low_p', 'f8'),
              ('close_p', 'f8'), ('tot_vlm', 'u8'), ('prd_vlm', 'u8'),
              ('num_trds', 'u8')])
@@ -3179,6 +3180,7 @@ class BarConn(FeedConn):
         assert fields[0][0] == "B" and fields[1][0] == "B"
 
         interval_data = self._empty_interval_msg
+        interval_data['request_id'] = fields[0]
         interval_data['symbol'] = fields[2]
         interval_data['date'], interval_data['time'] = fr.read_posix_ts(
                 fields[3])
@@ -3207,7 +3209,7 @@ class BarConn(FeedConn):
     def watch(self, symbol: str, interval_len: int, interval_type: str = None,
               bgn_flt: datetime.time = None, end_flt: datetime.time = None,
               update: int = None, bgn_bars: datetime.datetime = None,
-              lookback_days: int = None, lookback_bars: int = None) -> None:
+              lookback_days: int = None, lookback_bars: int = None) -> str:
         """
         Request live interval (bar) data.
 
@@ -3259,9 +3261,11 @@ class BarConn(FeedConn):
             bf_str, ef_str, request_id, interval_type, update_str)
         self._send_cmd(bar_cmd)
 
-    def unwatch(self, symbol: str):
+        return request_id
+
+    def unwatch(self, symbol: str, request_id: str = ""):
         """Unwatch a specific symbol"""
-        self._send_cmd("BR,%s" % symbol)
+        self._send_cmd("BR,%s,%s" % (symbol, request_id))
 
     def unwatch_all(self) -> None:
         """Unwatch all symbols."""
