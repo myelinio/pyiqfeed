@@ -14,9 +14,11 @@ from .listeners import VerboseAdminListener, VerboseBarListener
 
 from .service import FeedService
 
-from .field_readers import (us_since_midnight_to_time,
-                            datetime64_to_date,
-                            date_us_to_datetime)
+from .field_readers import (
+    us_since_midnight_to_time,
+    datetime64_to_date,
+    date_us_to_datetime,
+)
 
 from .exceptions import NoDataError, UnexpectedField, UnexpectedMessage
 from .exceptions import UnexpectedProtocol, UnauthorizedError

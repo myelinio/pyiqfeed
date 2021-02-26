@@ -198,8 +198,7 @@ class SilentQuoteListener(SilentIQFeedListener):
         """Relic from old authorization mechanism. Ignore."""
         pass
 
-    def process_customer_info(self,
-                              cust_info: QuoteConn.CustomerInfoMsg) -> None:
+    def process_customer_info(self, cust_info: QuoteConn.CustomerInfoMsg) -> None:
         """
         Information about your entitlements etc.
 
@@ -293,8 +292,7 @@ class SilentAdminListener(SilentIQFeedListener):
         """Request not to autoconnect processed."""
         pass
 
-    def process_client_stats(self,
-                             client_stats: AdminConn.ClientStatsMsg) -> None:
+    def process_client_stats(self, client_stats: AdminConn.ClientStatsMsg) -> None:
         """
         Message with information about a specific connection.
 
@@ -503,8 +501,7 @@ class VerboseQuoteListener(VerboseIQFeedListener):
     def process_keyok(self) -> None:
         print("%s: Authorization Key OK" % self._name)
 
-    def process_customer_info(self,
-                              cust_info: QuoteConn.CustomerInfoMsg) -> None:
+    def process_customer_info(self, cust_info: QuoteConn.CustomerInfoMsg) -> None:
         print("%s: Customer Information:" % self._name)
         print(cust_info)
 
@@ -517,8 +514,7 @@ class VerboseQuoteListener(VerboseIQFeedListener):
         print(levels)
 
     def process_symbol_limit_reached(self, sym: str) -> None:
-        print("%s: Symbol Limit Reached with subscription to %s" %
-              (self._name, sym))
+        print("%s: Symbol Limit Reached with subscription to %s" % (self._name, sym))
 
     def process_ip_addresses_used(self, ip: str) -> None:
         print("%s: IP Addresses Used: %s" % (self._name, ip))
@@ -557,8 +553,7 @@ class VerboseAdminListener(VerboseIQFeedListener):
     def process_autoconnect_off(self) -> None:
         print("%s: Autoconnect Off" % self._name)
 
-    def process_client_stats(self,
-                             client_stats: AdminConn.ClientStatsMsg) -> None:
+    def process_client_stats(self, client_stats: AdminConn.ClientStatsMsg) -> None:
         print("%s: Client Stats:" % self._name)
         print(client_stats)
 
@@ -597,5 +592,6 @@ class VerboseBarListener(VerboseIQFeedListener):
         print("%s: Replaced previous watch: %s" % (self._name, symbol))
 
     def process_watch(self, symbol: str, interval: int, request_id: str):
-        print("%s: Process watch: %s, %d, %s" %
-              (self._name, symbol, interval, request_id))
+        print(
+            "%s: Process watch: %s, %d, %s" % (self._name, symbol, interval, request_id)
+        )

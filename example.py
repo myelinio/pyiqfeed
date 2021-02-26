@@ -19,10 +19,12 @@ from localconfig.passwords import dtn_product_id, dtn_login, dtn_password
 def launch_service():
     """Check if IQFeed.exe is running and start if not"""
 
-    svc = iq.FeedService(product=dtn_product_id,
-                         version="Debugging",
-                         login=dtn_login,
-                         password=dtn_password)
+    svc = iq.FeedService(
+        product=dtn_product_id,
+        version="Debugging",
+        login=dtn_login,
+        password=dtn_password,
+    )
     svc.launch(headless=False)
 
     # If you are running headless comment out the line above and uncomment
@@ -75,13 +77,18 @@ def get_trades_only(ticker: str, seconds: int):
 
 def get_live_interval_bars(ticker: str, bar_len: int, seconds: int):
     """Get real-time interval bars"""
-    bar_conn = iq.BarConn(name='pyiqfeed-Example-interval-bars')
+    bar_conn = iq.BarConn(name="pyiqfeed-Example-interval-bars")
     bar_listener = iq.VerboseBarListener("Bar Listener")
     bar_conn.add_listener(bar_listener)
 
     with iq.ConnConnector([bar_conn]) as connector:
-        bar_conn.watch(symbol=ticker, interval_len=bar_len,
-                       interval_type='s', update=1, lookback_bars=10)
+        bar_conn.watch(
+            symbol=ticker,
+            interval_len=bar_len,
+            interval_type="s",
+            update=1,
+            lookback_bars=10,
+        )
         time.sleep(seconds)
 
 
@@ -93,10 +100,12 @@ def get_administrative_messages(seconds: int):
     admin_conn.add_listener(admin_listener)
 
     with iq.ConnConnector([admin_conn]) as connector:
-        admin_conn.set_admin_variables(product=dtn_product_id,
-                                       login=dtn_login,
-                                       password=dtn_password,
-                                       autoconnect=True)
+        admin_conn.set_admin_variables(
+            product=dtn_product_id,
+            login=dtn_login,
+            password=dtn_password,
+            autoconnect=True,
+        )
         admin_conn.client_stats_on()
         time.sleep(seconds)
 
@@ -115,19 +124,20 @@ def get_tickdata(ticker: str, max_ticks: int, num_days: int):
     with iq.ConnConnector([hist_conn]) as connector:
         # Get the last 10 trades
         try:
-            tick_data = hist_conn.request_ticks(ticker=ticker,
-                                                max_ticks=max_ticks)
+            tick_data = hist_conn.request_ticks(ticker=ticker, max_ticks=max_ticks)
             print(tick_data)
 
             # Get the last num_days days trades between 10AM and 12AM
             # Limit to max_ticks ticks else too much will be printed on screen
             bgn_flt = datetime.time(hour=10, minute=0, second=0)
             end_flt = datetime.time(hour=12, minute=0, second=0)
-            tick_data = hist_conn.request_ticks_for_days(ticker=ticker,
-                                                         num_days=num_days,
-                                                         bgn_flt=bgn_flt,
-                                                         end_flt=end_flt,
-                                                         max_ticks=max_ticks)
+            tick_data = hist_conn.request_ticks_for_days(
+                ticker=ticker,
+                num_days=num_days,
+                bgn_flt=bgn_flt,
+                end_flt=end_flt,
+                max_ticks=max_ticks,
+            )
             print(tick_data)
 
             # Get all ticks between 9:30AM 5 days ago and 9:30AM today
@@ -135,29 +145,23 @@ def get_tickdata(ticker: str, max_ticks: int, num_days: int):
             # screen
             today = datetime.date.today()
             sdt = today - datetime.timedelta(days=5)
-            start_tm = datetime.datetime(year=sdt.year,
-                                         month=sdt.month,
-                                         day=sdt.day,
-                                         hour=9,
-                                         minute=30)
+            start_tm = datetime.datetime(
+                year=sdt.year, month=sdt.month, day=sdt.day, hour=9, minute=30
+            )
             edt = today
-            end_tm = datetime.datetime(year=edt.year,
-                                       month=edt.month,
-                                       day=edt.day,
-                                       hour=9,
-                                       minute=30)
+            end_tm = datetime.datetime(
+                year=edt.year, month=edt.month, day=edt.day, hour=9, minute=30
+            )
 
-            tick_data = hist_conn.request_ticks_in_period(ticker=ticker,
-                                                          bgn_prd=start_tm,
-                                                          end_prd=end_tm,
-                                                          max_ticks=max_ticks)
+            tick_data = hist_conn.request_ticks_in_period(
+                ticker=ticker, bgn_prd=start_tm, end_prd=end_tm, max_ticks=max_ticks
+            )
             print(tick_data)
         except (iq.NoDataError, iq.UnauthorizedError) as err:
             print("No data returned because {0}".format(err))
 
 
-def get_historical_bar_data(ticker: str, bar_len: int, bar_unit: str,
-                            num_bars: int):
+def get_historical_bar_data(ticker: str, bar_len: int, bar_unit: str, num_bars: int):
     """Shows how to get interval bars."""
     hist_conn = iq.HistoryConn(name="pyiqfeed-Example-historical-bars")
     hist_listener = iq.VerboseIQFeedListener("History Bar Listener")
@@ -167,31 +171,39 @@ def get_historical_bar_data(ticker: str, bar_len: int, bar_unit: str,
         # look at conn.py for request_bars, request_bars_for_days and
         # request_bars_in_period for other ways to specify time periods etc
         try:
-            bars = hist_conn.request_bars(ticker=ticker,
-                                          interval_len=bar_len,
-                                          interval_type=bar_unit,
-                                          max_bars=num_bars)
+            bars = hist_conn.request_bars(
+                ticker=ticker,
+                interval_len=bar_len,
+                interval_type=bar_unit,
+                max_bars=num_bars,
+            )
             print(bars)
 
             today = datetime.date.today()
             start_date = today - datetime.timedelta(days=10)
-            start_time = datetime.datetime(year=start_date.year,
-                                           month=start_date.month,
-                                           day=start_date.day,
-                                           hour=0,
-                                           minute=0,
-                                           second=0)
-            end_time = datetime.datetime(year=today.year,
-                                         month=today.month,
-                                         day=today.day,
-                                         hour=23,
-                                         minute=59,
-                                         second=59)
-            bars = hist_conn.request_bars_in_period(ticker=ticker,
-                                                    interval_len=bar_len,
-                                                    interval_type=bar_unit,
-                                                    bgn_prd=start_time,
-                                                    end_prd=end_time)
+            start_time = datetime.datetime(
+                year=start_date.year,
+                month=start_date.month,
+                day=start_date.day,
+                hour=0,
+                minute=0,
+                second=0,
+            )
+            end_time = datetime.datetime(
+                year=today.year,
+                month=today.month,
+                day=today.day,
+                hour=23,
+                minute=59,
+                second=59,
+            )
+            bars = hist_conn.request_bars_in_period(
+                ticker=ticker,
+                interval_len=bar_len,
+                interval_type=bar_unit,
+                bgn_prd=start_time,
+                end_prd=end_time,
+            )
             print(bars)
         except (iq.NoDataError, iq.UnauthorizedError) as err:
             print("No data returned because {0}".format(err))
@@ -248,7 +260,8 @@ def get_ticker_lookups(ticker: str):
 
     with iq.ConnConnector([lookup_conn]) as connector:
         syms = lookup_conn.request_symbols_by_filter(
-            search_term=ticker, search_field='s')
+            search_term=ticker, search_field="s"
+        )
         print("Symbols with %s in them" % ticker)
         print(syms)
         print("")
@@ -274,12 +287,16 @@ def get_equity_option_chain(ticker: str):
         # noinspection PyArgumentEqualDefault
         e_opt = lookup_conn.request_equity_option_chain(
             symbol=ticker,
-            opt_type='pc',
-            month_codes="".join(iq.LookupConn.call_month_letters +
-                                iq.LookupConn.put_month_letters),
+            opt_type="pc",
+            month_codes="".join(
+                iq.LookupConn.call_month_letters + iq.LookupConn.put_month_letters
+            ),
             near_months=None,
             include_binary=True,
-            filt_type=0, filt_val_1=None, filt_val_2=None)
+            filt_type=0,
+            filt_val_1=None,
+            filt_val_2=None,
+        )
         print("Currently trading options for %s" % ticker)
         print(e_opt)
         lookup_conn.remove_listener(lookup_listener)
@@ -296,7 +313,8 @@ def get_futures_chain(ticker: str):
             month_codes="".join(iq.LookupConn.futures_month_letters),
             years="67",
             near_months=None,
-            timeout=None)
+            timeout=None,
+        )
         print("Futures symbols with underlying %s" % ticker)
         print(f_syms)
         lookup_conn.remove_listener(lookup_listener)
@@ -313,7 +331,8 @@ def get_futures_spread_chain(ticker: str):
             month_codes="".join(iq.LookupConn.futures_month_letters),
             years="67",
             near_months=None,
-            timeout=None)
+            timeout=None,
+        )
         print("Futures Spread symbols with underlying %s" % ticker)
         print(f_syms)
         lookup_conn.remove_listener(lookup_listener)
@@ -327,11 +346,13 @@ def get_futures_options_chain(ticker: str):
     with iq.ConnConnector([lookup_conn]) as connector:
         f_syms = lookup_conn.request_futures_option_chain(
             symbol=ticker,
-            month_codes="".join(iq.LookupConn.call_month_letters +
-                                iq.LookupConn.put_month_letters),
+            month_codes="".join(
+                iq.LookupConn.call_month_letters + iq.LookupConn.put_month_letters
+            ),
             years="67",
             near_months=None,
-            timeout=None)
+            timeout=None,
+        )
         print("Futures Option symbols with underlying %s" % ticker)
         print(f_syms)
         lookup_conn.remove_listener(lookup_listener)
@@ -351,7 +372,8 @@ def get_news():
 
         print("Latest 10 headlines:")
         headlines = news_conn.request_news_headlines(
-            sources=[], symbols=[], date=None, limit=10)
+            sources=[], symbols=[], date=None, limit=10
+        )
         print(headlines)
         print("")
 
@@ -365,8 +387,8 @@ def get_news():
         week_ago = today - datetime.timedelta(days=7)
 
         counts = news_conn.request_story_counts(
-            symbols=["AAPL", "IBM", "TSLA"],
-            bgn_dt=week_ago, end_dt=today)
+            symbols=["AAPL", "IBM", "TSLA"], bgn_dt=week_ago, end_dt=today
+        )
         print("Number of news stories in last week for AAPL, IBM and TSLA:")
         print(counts)
         print("")
@@ -374,28 +396,51 @@ def get_news():
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run pyiqfeed example code")
-    parser.add_argument('-l', action="store_true", dest='level_1',
-                        help="Run Level 1 Quotes")
-    parser.add_argument('-r', action="store_true", dest='regional_quotes',
-                        help="Run Regional Quotes")
-    parser.add_argument('-t', action="store_true", dest='trade_updates',
-                        help="Run Trades Only Quotes")
-    parser.add_argument('-i', action="store_true", dest='interval_data',
-                        help="Run interval data")
-    parser.add_argument("-a", action='store_true', dest='admin_socket',
-                        help="Run Administrative Connection")
-    parser.add_argument("-k", action='store_true', dest='historical_tickdata',
-                        help="Get historical tickdata")
-    parser.add_argument("-b", action='store_true', dest='historical_bars',
-                        help="Get historical bar-data")
-    parser.add_argument("-d", action='store_true', dest='historical_daily_data',
-                        help="Get historical daily data")
-    parser.add_argument("-f", action='store_true', dest='reference_data',
-                        help="Get reference data")
-    parser.add_argument("-c", action='store_true', dest='lookups_and_chains',
-                        help="Lookups and Chains")
-    parser.add_argument("-n", action='store_true', dest='news',
-                        help="News related stuff")
+    parser.add_argument(
+        "-l", action="store_true", dest="level_1", help="Run Level 1 Quotes"
+    )
+    parser.add_argument(
+        "-r", action="store_true", dest="regional_quotes", help="Run Regional Quotes"
+    )
+    parser.add_argument(
+        "-t", action="store_true", dest="trade_updates", help="Run Trades Only Quotes"
+    )
+    parser.add_argument(
+        "-i", action="store_true", dest="interval_data", help="Run interval data"
+    )
+    parser.add_argument(
+        "-a",
+        action="store_true",
+        dest="admin_socket",
+        help="Run Administrative Connection",
+    )
+    parser.add_argument(
+        "-k",
+        action="store_true",
+        dest="historical_tickdata",
+        help="Get historical tickdata",
+    )
+    parser.add_argument(
+        "-b",
+        action="store_true",
+        dest="historical_bars",
+        help="Get historical bar-data",
+    )
+    parser.add_argument(
+        "-d",
+        action="store_true",
+        dest="historical_daily_data",
+        help="Get historical daily data",
+    )
+    parser.add_argument(
+        "-f", action="store_true", dest="reference_data", help="Get reference data"
+    )
+    parser.add_argument(
+        "-c", action="store_true", dest="lookups_and_chains", help="Lookups and Chains"
+    )
+    parser.add_argument(
+        "-n", action="store_true", dest="news", help="News related stuff"
+    )
     results = parser.parse_args()
 
     launch_service()
@@ -413,10 +458,7 @@ if __name__ == "__main__":
     if results.historical_tickdata:
         get_tickdata(ticker="SPY", max_ticks=100, num_days=4)
     if results.historical_bars:
-        get_historical_bar_data(ticker="SPY",
-                                bar_len=60,
-                                bar_unit='s',
-                                num_bars=100)
+        get_historical_bar_data(ticker="SPY", bar_len=60, bar_unit="s", num_bars=100)
     if results.historical_daily_data:
         get_daily_data(ticker="SPY", num_days=10)
     if results.reference_data:

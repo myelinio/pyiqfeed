@@ -42,8 +42,9 @@ log.addHandler(logging.NullHandler())
 
 
 def _is_iqfeed_running(
-        iqfeed_host: str="127.0.0.1",
-        iqfeed_ports: Sequence=(9300, 5009, 9100, 9200, 9400)) -> bool:
+    iqfeed_host: str = "127.0.0.1",
+    iqfeed_ports: Sequence = (9300, 5009, 9100, 9200, 9400),
+) -> bool:
     """
     Return true if you can connect to iqfeed_sockets
 
@@ -87,38 +88,38 @@ class FeedService:
 
     """
 
-    def __init__(self,
-                 product: str,
-                 version: str,
-                 login: str,
-                 password: str):
+    def __init__(self, product: str, version: str, login: str, password: str):
 
         self.product = product
         self.version = version
         self.login = login
         self.password = password
 
-        self.iqfeed_host = os.getenv('IQFEED_HOST') or "127.0.0.1"
-        quote_port = int(os.getenv('IQFEED_PORT_QUOTE') or 5009)
-        lookup_port = int(os.getenv('IQFEED_PORT_LOOKUP') or 9100)
-        depth_port = int(os.getenv('IQFEED_PORT_DEPTH') or 9200)
-        admin_port = int(os.getenv('IQFEED_PORT_ADMIN') or 9300)
-        deriv_port = int(os.getenv('IQFEED_PORT_DERIV') or 9400)
+        self.iqfeed_host = os.getenv("IQFEED_HOST") or "127.0.0.1"
+        quote_port = int(os.getenv("IQFEED_PORT_QUOTE") or 5009)
+        lookup_port = int(os.getenv("IQFEED_PORT_LOOKUP") or 9100)
+        depth_port = int(os.getenv("IQFEED_PORT_DEPTH") or 9200)
+        admin_port = int(os.getenv("IQFEED_PORT_ADMIN") or 9300)
+        deriv_port = int(os.getenv("IQFEED_PORT_DERIV") or 9400)
 
         # Admin port is first since that is ready first
-        self.iqfeed_ports = (admin_port,
-                             quote_port,
-                             lookup_port,
-                             depth_port,
-                             deriv_port)
+        self.iqfeed_ports = (
+            admin_port,
+            quote_port,
+            lookup_port,
+            depth_port,
+            deriv_port,
+        )
 
         self.iqconnect_process = None
 
-    def launch(self,
-               timeout: int=20,
-               check_conn: bool=True,
-               headless: bool=False,
-               nohup: bool=True) -> None:
+    def launch(
+        self,
+        timeout: int = 20,
+        check_conn: bool = True,
+        headless: bool = False,
+        nohup: bool = True,
+    ) -> None:
         """
         Launch IQConnect.exe if necessary
 
@@ -130,18 +131,19 @@ class FeedService:
 
         """
         # noinspection PyPep8
-        iqfeed_args = ("-product %s -version %s -login %s -password %s -autoconnect -savelogininfo" %
-                       (self.product, self.version, self.login, self.password))
+        iqfeed_args = (
+            "-product %s -version %s -login %s -password %s -autoconnect -savelogininfo"
+            % (self.product, self.version, self.login, self.password)
+        )
 
         if not _is_iqfeed_running(self.iqfeed_host, self.iqfeed_ports):
-            if sys.platform == 'win32':
+            if sys.platform == "win32":
                 # noinspection PyPep8Naming
-                ShellExecute = __import__('win32api').ShellExecute
+                ShellExecute = __import__("win32api").ShellExecute
                 # noinspection PyPep8Naming
-                SW_SHOWNORMAL = __import__('win32con').SW_SHOWNORMAL
-                ShellExecute(0, "open", "IQConnect.exe", iqfeed_args, "",
-                             SW_SHOWNORMAL)
-            elif sys.platform == 'darwin' or sys.platform == 'linux':
+                SW_SHOWNORMAL = __import__("win32con").SW_SHOWNORMAL
+                ShellExecute(0, "open", "IQConnect.exe", iqfeed_args, "", SW_SHOWNORMAL)
+            elif sys.platform == "darwin" or sys.platform == "linux":
                 base_iqfeed_call = "wine iqconnect.exe %s" % iqfeed_args
                 prefix_str = ""
                 if nohup:
@@ -157,21 +159,20 @@ class FeedService:
                     stdin=subprocess.DEVNULL,
                     stdout=subprocess.DEVNULL,
                     stderr=subprocess.DEVNULL,
-                    preexec_fn=os.setpgrp)
+                    preexec_fn=os.setpgrp,
+                )
 
             if check_conn:
                 start_time = time.time()
-                while not _is_iqfeed_running(iqfeed_host=self.iqfeed_host,
-                                             iqfeed_ports=self.iqfeed_ports):
+                while not _is_iqfeed_running(
+                    iqfeed_host=self.iqfeed_host, iqfeed_ports=self.iqfeed_ports
+                ):
                     time.sleep(1)
                     if time.time() - start_time > timeout:
                         raise RuntimeError("Launching IQFeed timed out.")
         else:
-            log.warning(
-                "Not launching IQFeed.exe because it is already running.")
+            log.warning("Not launching IQFeed.exe because it is already running.")
 
     def admin_variables(self):
         """Return a dict of admin variables used to launch"""
-        return {"product": self.product,
-                "login": self.login,
-                "password": self.password}
+        return {"product": self.product, "login": self.login, "password": self.password}
