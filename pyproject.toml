@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "pyiqfeed"
+version = "0.10"
+description = "Handles connections to IQFeed, the market data feed by DTN"
+authors = [
+    "Ashwin Kapur <ashwin.kapur@gmail.com>",
+    "Maxim Vinogradov <vinogradov.v.maxim@gmail.com>"
+]
+license = "GPL-2.0"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+numpy = "^1.20.1"
+
+[tool.poetry.dev-dependencies]
+isort = "^5.7.0"
+flake8 = "^3.8.4"
+black = "^20.8b1"
+autoflake = "^1.4"
+
+[tool.isort]
+float_to_top = true
+force_grid_wrap = 0
+include_trailing_comma = true
+line_length = 88
+multi_line_output = 3
+
+[build-system]
+build-backend = "poetry.masonry.api"
+requires = ["poetry>=1.1"]
