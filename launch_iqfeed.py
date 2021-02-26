@@ -42,29 +42,40 @@ from passwords import dtn_product_id, dtn_login, dtn_password
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser(description="Launch IQFeed.")
-    parser.add_argument('--nohup', action='store_true',
-                        dest='nohup', default=False,
-                        help="Don't kill IQFeed.exe when this script exists.")
-    parser.add_argument('--headless', action="store_true",
-                        dest='headless', default=False,
-                        help="Launch IQFeed in a headless XServer.")
-    parser.add_argument('--control_file', action='store',
-                        dest='ctrl_file', default="/tmp/stop_iqfeed.ctrl",
-                        help='Stop running if this file exists.')
+    parser.add_argument(
+        "--nohup",
+        action="store_true",
+        dest="nohup",
+        default=False,
+        help="Don't kill IQFeed.exe when this script exists.",
+    )
+    parser.add_argument(
+        "--headless",
+        action="store_true",
+        dest="headless",
+        default=False,
+        help="Launch IQFeed in a headless XServer.",
+    )
+    parser.add_argument(
+        "--control_file",
+        action="store",
+        dest="ctrl_file",
+        default="/tmp/stop_iqfeed.ctrl",
+        help="Stop running if this file exists.",
+    )
     arguments = parser.parse_args()
 
-    IQ_FEED = iq.FeedService(product=dtn_product_id,
-                             version="IQFEED_LAUNCHER",
-                             login=dtn_login,
-                             password=dtn_password)
+    IQ_FEED = iq.FeedService(
+        product=dtn_product_id,
+        version="IQFEED_LAUNCHER",
+        login=dtn_login,
+        password=dtn_password,
+    )
 
     nohup = arguments.nohup
     headless = arguments.headless
     ctrl_file = arguments.ctrl_file
-    IQ_FEED.launch(timeout=30,
-                   check_conn=True,
-                   headless=headless,
-                   nohup=nohup)
+    IQ_FEED.launch(timeout=30, check_conn=True, headless=headless, nohup=nohup)
 
     # Modify code below to connect to the socket etc as described above
     admin = iq.AdminConn(name="Launcher")

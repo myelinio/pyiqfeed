@@ -9,11 +9,13 @@ Exceptions thrown by pyiqfeed that are specific to pyiqfeed
 
 class NoDataError(KeyError):
     """Raised when a DTN function returns No Data."""
+
     pass
 
 
 class UnauthorizedError(RuntimeError):
     """Raised if you make a request for data you are not authorized for."""
+
     pass
 
 
@@ -25,6 +27,7 @@ class UnexpectedField(BaseException):
     not be caught and should result in a crash instead.
 
     """
+
     pass
 
 
@@ -36,6 +39,7 @@ class UnexpectedMessage(BaseException):
     not be caught and should result in a crash instead.
 
     """
+
     pass
 
 
@@ -47,4 +51,5 @@ class UnexpectedProtocol(BaseException):
     not be caught and should result in a crash instead.
 
     """
+
     pass
