@@ -72,7 +72,7 @@ class FeedConn:
 
     """
 
-    protocol = "6.0"
+    protocol = "6.1"
 
     iqfeed_host = os.getenv('IQFEED_HOST', "127.0.0.1")
     quote_port = int(os.getenv('IQFEED_PORT_QUOTE', 5009))
@@ -518,76 +518,144 @@ class QuoteConn(FeedConn):
     port = FeedConn.quote_port
 
     # Type of numpy structured array used to return regional quotes.
-    regional_type = np.dtype([('Symbol', 'S64'), ('Regional Bid', 'f8'),
-                              ('Regional BidSize', 'u8'),
-                              ('Regional BidTime', 'u8'),
-                              ('Regional Ask', 'f8'),
-                              ('Regional AskSize', 'u8'),
-                              ('Regional AskTime', 'u8'),
-                              ('Market Center', 'u1'),
-                              ('Fraction Display Code', 'u1'),
-                              ('Decimal Precision', 'u2')])
+    regional_type = np.dtype(
+        [
+            ("Symbol", "S64"), 
+            ("Regional Bid", "f8"),
+            ("Regional BidSize", "u8"),
+            ("Regional BidTime", "u8"),
+            ("Regional Ask", "f8"),
+            ("Regional AskSize", "u8"),
+            ("Regional AskTime", "u8"),
+            ("Market Center", "u1"),
+            ("Fraction Display Code", "u1"),
+            ("Decimal Precision", "u2")
+        ]
+    )
 
     # List of fields provided by IQFeed.exe in the fundamentals message.
-    fundamental_fields = ["Symbol", "Exchange ID", "PE", "Average Volume",
-                          "52 Week High", "52 Week Low", "Calendar Year High",
-                          "Calendar Year Low", "Dividend Yield",
-                          "Dividend Amount", "Dividend Rate", "Pay Date",
-                          "Ex-dividend Date", "(Reserved)", "(Reserved)",
-                          "(Reserved)", "Short Interest", "(Reserved)",
-                          "Current Year EPS", "Next Year EPS",
-                          "Five-year Growth Percentage", "Fiscal Year End",
-                          "(Reserved)", "Company Name", "Root Option Symbol",
-                          "Percent Held By Institutions", "Beta", "Leaps",
-                          "Current Assets", "Current Liabilities",
-                          "Balance Sheet Date", "Long-term Debt",
-                          "Common Shares Outstanding", "(Reserved)",
-                          "Split Factor 1", "Split Factor 2", "(Reserved)",
-                          "Market Center", "Format Code", "Precision", "SIC",
-                          "Historical Volatility", "Security Type",
-                          "Listed Market", "52 Week High Date",
-                          "52 Week Low Date", "Calendar Year High Date",
-                          "Calendar Year Low Date", "Year End Close",
-                          "Maturity Date", "Coupon Rate", "Expiration Date",
-                          "Strike Price", "NAICS", "Exchange Root",
-                          "Option Premium Multiplier",
-                          "Option Multiple Deliverable"]
+    fundamental_fields = [
+        "Symbol", 
+        "Exchange ID", 
+        "PE", 
+        "Average Volume",
+        "52 Week High", 
+        "52 Week Low", 
+        "Calendar Year High",
+        "Calendar Year Low", 
+        "Dividend Yield",
+        "Dividend Amount", 
+        "Dividend Rate", 
+        "Pay Date",
+        "Ex-dividend Date", 
+        "Current Year EPS",
+        "Next Year EPS", 
+        "Five-year Growth Percentage",
+        "Fiscal Year End", 
+        "Company Name",
+        "Root Option Symbol",
+        "Percent Held By Institutions", 
+        "Beta", 
+        "Leaps",
+        "Current Assets", 
+        "Current Liabilities",
+        "Balance Sheet Date", 
+        "Long-term Debt",
+        "Common Shares Outstanding", 
+        "Split Factor 1",
+        "Split Factor 2", 
+        "Format Code", 
+        "Precision", 
+        "SIC",
+        "Historical Volatility", 
+        "Security Type",
+        "Listed Market", 
+        "52 Week High Date",
+        "52 Week Low Date", 
+        "Calendar Year High Date",
+        "Calendar Year Low Date", 
+        "Year End Close",
+        "Maturity Date", 
+        "Coupon Rate", 
+        "Expiration Date",
+        "Strike Price", 
+        "NAICS", 
+        "Exchange Root",
+        "Option Premium Multiplier",
+        "Option Multiple Deliverable", 
+        "Session Open Time",
+        "Session Close Time", 
+        "Base Currency",
+        "Contract Size", 
+        "Contract Months",
+        "Minimum Tick Size", 
+        "First Delivery Date", 
+        "FIGI",
+        "Security SubType",
+    ]
 
     # Type of numpy structured array used to return fundamental data.
-    fundamental_type = [('Symbol', 'S128'), ('PE', 'f8'),
-                        ('Average Volume', 'f8'), ('52 Week High', 'f8'),
-                        ('52 Week Low', 'f8'), ('Calendar Year High', 'f8'),
-                        ('Calendar Year Low', 'f8'), ('Dividend Yield', 'f8'),
-                        ('Dividend Amount', 'f8'), ('Dividend Rate', 'f8'),
-                        ('Pay Date', 'M8[D]'), ('Ex-dividend Date', 'M8[D]'),
-                        ('Short Interest', 'i8'), ('Current Year EPS', 'f8'),
-                        ('Next Year EPS', 'f8'),
-                        ('Five-year Growth Percentage', 'f8'),
-                        ('Fiscal Year End', 'u1'), ('Company Name', 'S256'),
-                        ('Root Option Symbol', 'S256'),
-                        ('Percent Held By Institutions', 'f8'), ('Beta', 'f8'),
-                        ('Leaps', 'S128'), ('Current Assets', 'f8'),
-                        ('Current Liabilities', 'f8'),
-                        ('Balance Sheet Date', 'M8[D]'),
-                        ('Long-term Debt', 'f8'),
-                        ('Common Shares Outstanding', 'f8'),
-                        ('Split Factor 1 Date', 'M8[D]'),
-                        ('Split Factor 1', 'f8'),
-                        ('Split Factor 2 Date', 'M8[D]'),
-                        ('Split Factor 2', 'f8'), ('Format Code', 'u1'),
-                        ('Precision', 'u1'), ('SIC', 'u8'),
-                        ('Historical Volatility', 'f8'),
-                        ('Security Type', 'u1'), ('Listed Market', 'u1'),
-                        ('52 Week High Date', 'M8[D]'),
-                        ('52 Week Low Date', 'M8[D]'),
-                        ('Calendar Year High Date', 'M8[D]'),
-                        ('Calendar Year Low Date', 'M8[D]'),
-                        ('Year End Close', 'f8'), ('Maturity Date', 'M8[D]'),
-                        ('Coupon Rate', 'f8'), ('Expiration Date', 'M8[D]'),
-                        ('Strike Price', 'f8'), ('NAICS', 'u8'),
-                        ('Exchange Root', 'S128'),
-                        ('Option Premium Multiplier', 'f8'),
-                        ('Option Multiple Deliverable', 'u8')]
+    fundamental_type = [
+        ("Symbol", "S128"), 
+        ("Exchange ID", "u1"),
+        ("PE", "f8"),
+        ("Average Volume", "f8"),
+        ("52 Week High", "f8"),
+        ("52 Week Low", "f8"), 
+        ("Calendar Year High", "f8"),
+        ("Calendar Year Low", "f8"), 
+        ("Dividend Yield", "f8"),
+        ("Dividend Amount", "f8"), 
+        ("Dividend Rate", "f8"),
+        ("Pay Date", "M8[D]"), 
+        ("Ex-dividend Date", "M8[D]"),
+        ("Current Year EPS", "f8"),
+        ("Next Year EPS", "f8"),
+        ("Five-year Growth Percentage", "f8"),
+        ("Fiscal Year End", "u1"), 
+        ("Company Name", "S256"),
+        ("Root Option Symbol", "S256"),
+        ("Percent Held By Institutions", "f8"), 
+        ("Beta", "f8"),
+        ("Leaps", "S128"), 
+        ("Current Assets", "f8"),
+        ("Current Liabilities", "f8"),
+        ("Balance Sheet Date", "M8[D]"),
+        ("Long-term Debt", "f8"),
+        ("Common Shares Outstanding", "f8"),
+        ("Split Factor 1 Date", "M8[D]"),
+        ("Split Factor 1", "f8"),
+        ("Split Factor 2 Date", "M8[D]"),
+        ("Split Factor 2", "f8"), 
+        ("Format Code", "u1"),
+        ("Precision", "u1"), 
+        ("SIC", "u8"),
+        ("Historical Volatility", "f8"),
+        ("Security Type", "u1"), 
+        ("Listed Market", "u1"),
+        ("52 Week High Date", "M8[D]"),
+        ("52 Week Low Date", "M8[D]"),
+        ("Calendar Year High Date", "M8[D]"),
+        ("Calendar Year Low Date", "M8[D]"),
+        ("Year End Close", "f8"), 
+        ("Maturity Date", "M8[D]"),
+        ("Coupon Rate", "f8"), 
+        ("Expiration Date", "M8[D]"),
+        ("Strike Price", "f8"), 
+        ("NAICS", "u8"),
+        ("Exchange Root", "S128"),
+        ("Option Premium Multiplier", "f8"),
+        ("Option Multiple Deliverable", "u8"),
+        ("Session Open Time", "u8"),
+        ("Session Close Time", "u8"),
+        ("Base Currency", "S128"), 
+        ("Contract Size", "u8"),
+        ("Contract Months", "S12"),
+        ("Minimum Tick Size", "f8"),
+        ("First Delivery Date", "M8[D]"), 
+        ("FIGI", "S12"),
+        ("Security SubType", "u1"),
+    ]
 
     # For quote updates (provided when the top of book quote changes or a
     # trade happens) IQFeed.exe can send dynamic fieldsets. This means that
@@ -602,138 +670,142 @@ class QuoteConn(FeedConn):
     # instances of QuoteConn. Use one for all stock subscriptions and one for
     # all options subscriptions. They can both update the same listener if
     # that is what you want.
-    quote_msg_map = {'Symbol': ('Symbol', 'S128', lambda x: x),
-                     '7 Day Yield': ('7 Day Yield', 'f8', fr.read_float64),
-                     'Ask': ('Ask', 'f8', fr.read_float64),
-                     'Ask Change': ('Ask Change', 'f8', fr.read_float64),
-                     'Ask Market Center':
-                         ('Ask Market Center', 'u1', fr.read_uint8),
-                     'Ask Size': ('Ask Size', 'u8', fr.read_uint64),
-                     'Ask Time': ('Ask Time', 'u8', fr.read_hhmmssus),
-                     'Available Regions':
-                         ('Available Regions', 'S128', lambda x: x),
-                     # TODO: Parse:
-                     'Average Maturity':
-                         ('Average Maturity', 'f8', fr.read_float64),
-                     'Bid': ('Bid', 'f8', fr.read_float64),
-                     'Bid Change': ('Bid Change', 'f8', fr.read_float64),
-                     'Bid Market Center':
-                         ('Bid Market Center', 'u1', fr.read_uint8),
-                     'Bid Size': ('Bid Size', 'u8', fr.read_uint64),
-                     'Bid Time': ('Bid Time', 'u8', fr.read_hhmmssus),
-                     'Change': ('Change', 'f8', fr.read_float64),
-                     'Change From Open': (
-                     'Change From Open', 'f8', fr.read_float64),
-                     'Close': ('Close', 'f8', fr.read_float64),
-                     'Close Range 1': ('Close Range 1', 'f8', fr.read_float64),
-                     'Close Range 2': ('Close Range 2', 'f8', fr.read_float64),
-                     'Days to Expiration':
-                         ('Days to Expiration', 'u2', fr.read_uint16),
-                     'Decimal Precision':
-                         ('Decimal Precision', 'u1', fr.read_uint8),
-                     'Delay': ('Delay', 'u1', fr.read_uint8),
-                     'Exchange ID': ('Exchange ID', 'u1', fr.read_hex),
-                     'Extended Trade': ('Extended Price', 'f8',
-                                        fr.read_float64),
-                     'Extended Trade Date':
-                         ('Extended Trade Date', 'M8[D]', fr.read_mmddccyy),
-                     'Extended Trade Market Center':
-                         ('Extended Trade Market Center', 'u1', fr.read_uint8),
-                     'Extended Trade Size':
-                         ('Extended Trade Size', 'u8', fr.read_uint64),
-                     'Extended Trade Time':
-                         ('Extended Trade Time', 'u8', fr.read_hhmmssus),
-                     'Extended Trading Change':
-                         ('Extended Trading Change', 'f8', fr.read_float64),
-                     'Extended Trading Difference':
-                         ('Extended Trading Difference', 'f8',
-                          fr.read_float64),
-                     'Financial Status Indicator':
-                         ('Financial Status Indicator', 'S1', lambda x: x),
-                     # TODO: Parse:
-                     'Fraction Display Code':
-                         ('Fraction Display Code', 'u1', fr.read_uint8),
-                     'High': ('High', 'f8', fr.read_float64),
-                     'Last': ('Last', 'f8', fr.read_float64),
-                     'Last Date': ('Last Date', 'M8[D]', fr.read_mmddccyy),
-                     'Last Market Center':
-                         ('Last Market Center', 'u1', fr.read_uint8),
-                     'Last Size': ('Last Size', 'u8', fr.read_uint64),
-                     'Last Time': ('Last Time', 'u8', fr.read_hhmmssus),
-                     'Low': ('Low', 'f8', fr.read_float64),
-                     'Market Capitalization':
-                         ('Market Capitalization', 'f8', fr.read_float64),
-                     'Market Open':
-                         ('Market Open', 'b1', fr.read_is_market_open),
-                     'Message Contents':
-                         ('Message Contents', 'S9', lambda x: x),
-                     # TODO: Parse:
-                     'Most Recent Trade':
-                         ('Most Recent Trade', 'f8', fr.read_float64),
-                     'Most Recent Trade Conditions':
-                         ('Most Recent Trade Conditions', 'S16', lambda x: x),
-                     # todo: Parse
-                     'Most Recent Trade Date':
-                         ('Most Recent Trade Date', 'M8[D]', fr.read_mmddccyy),
-                     'Most Recent Trade Market Center':
-                         ('Most Recent Trade Market Center', 'u1',
-                          fr.read_uint8),
-                     'Most Recent Trade Size':
-                         ('Most Recent Trade Size', 'u8', fr.read_uint64),
-                     'Most Recent Trade Time':
-                         ('Most Recent Trade Time', 'u8', fr.read_hhmmssus),
-                     'Net Asset Value':
-                         ('Net Asset Value', 'f8', fr.read_float64),
-                     'Number of Trades Today':
-                         ('Number of Trades Today', 'u8', fr.read_uint64),
-                     'Open': ('Open', 'f8', fr.read_float64),
-                     'Open Interest': ('Open Interest', 'u8', fr.read_uint64),
-                     'Open Range 1': ('Open Range 1', 'f8', fr.read_float64),
-                     'Open Range 2': ('Open Range 2', 'f8', fr.read_float64),
-                     'Percent Change':
-                         ('Percent Change', 'f8', fr.read_float64),
-                     'Percent Off Average Volume':
-                         ('Percent Off Average Volume', 'f8', fr.read_float64),
-                     'Previous Day Volume':
-                         ('Previous Day Volume', 'u8', fr.read_uint64),
-                     'Price-Earnings Ratio':
-                         ('Price-Earnings Ratio', 'f8', fr.read_float64),
-                     'Range': ('Range', 'f8', fr.read_float64),
-                     'Restricted Code':
-                         ('Restricted Code', 'b1',
-                          fr.read_is_short_restricted),
-                     'Settle': ('Settle', 'f8', fr.read_float64),
-                     'Settlement Date':
-                         ('Settlement Date', 'M8[D]', fr.read_mmddccyy),
-                     'Spread': ('Spread', 'f8', fr.read_float64),
-                     'Tick': ('Tick', 'i8', fr.read_tick_direction),
-                     'TickID': ('TickId', 'u8', fr.read_uint64),
-                     'Total Volume': ('Total Volume', 'u8', fr.read_uint64),
-                     'Volatility': ('Volatility', 'f8', fr.read_float64),
-                     'VWAP': ('VWAP', 'f8', fr.read_float64)}
+    quote_msg_map = {
+        "Symbol": ("Symbol", "S128", lambda x: x),
+        "7 Day Yield": ("7 Day Yield", "f8", fr.read_float64),
+        "Ask": ("Ask", "f8", fr.read_float64),
+        "Ask Change": ("Ask Change", "f8", fr.read_float64),
+        "Ask Market Center": ("Ask Market Center", "u1", fr.read_uint8),
+        "Ask Size": ("Ask Size", "u8", fr.read_uint64),
+        "Ask Time": ("Ask Time", "u8", fr.read_hhmmssus),
+        "Available Regions": ("Available Regions", "S128", lambda x: x),
+        # TODO: Parse:
+        "Average Maturity": ("Average Maturity", "f8", fr.read_float64),
+        "Bid": ("Bid", "f8", fr.read_float64),
+        "Bid Change": ("Bid Change", "f8", fr.read_float64),
+        "Bid Market Center": ("Bid Market Center", "u1", fr.read_uint8),
+        "Bid Size": ("Bid Size", "u8", fr.read_uint64),
+        "Bid Time": ("Bid Time", "u8", fr.read_hhmmssus),
+        "Change": ("Change", "f8", fr.read_float64),
+        "Change From Open": ("Change From Open", "f8", fr.read_float64),
+        "Close": ("Close", "f8", fr.read_float64),
+        "Close Range 1": ("Close Range 1", "f8", fr.read_float64),
+        "Close Range 2": ("Close Range 2", "f8", fr.read_float64),
+        "Days to Expiration": ("Days to Expiration", "u2", fr.read_uint16),
+        "Decimal Precision": ("Decimal Precision", "u1", fr.read_uint8),
+        "Delay": ("Delay", "u1", fr.read_uint8),
+        "Exchange ID": ("Exchange ID", "u1", fr.read_hex),
+        "Extended Trade": ("Extended Price", "f8", fr.read_float64),
+        "Extended Trade Date": ("Extended Trade Date", "M8[D]", fr.read_mmddccyy),
+        "Extended Trade Market Center": (
+            "Extended Trade Market Center", "u1", fr.read_uint8
+        ),
+        "Extended Trade Size": ("Extended Trade Size", "u8", fr.read_uint64),
+        "Extended Trade Time": ("Extended Trade Time", "u8", fr.read_hhmmssus),
+        "Extended Trading Change": ("Extended Trading Change", "f8", fr.read_float64),
+        "Extended Trading Difference": (
+            "Extended Trading Difference", "f8", fr.read_float64
+        ),
+        "Financial Status Indicator": (
+            "Financial Status Indicator", "S1", lambda x: x
+        ),
+        # TODO: Parse:
+        "Fraction Display Code": ("Fraction Display Code", "u1", fr.read_uint8),
+        "High": ("High", "f8", fr.read_float64),
+        "Last": ("Last", "f8", fr.read_float64),
+        "Last Date": ("Last Date", "M8[D]", fr.read_mmddccyy),
+        "Last Market Center": ("Last Market Center", "u1", fr.read_uint8),
+        "Last Size": ("Last Size", "u8", fr.read_uint64),
+        "Last Time": ("Last Time", "u8", fr.read_hhmmssus),
+        "Low": ("Low", "f8", fr.read_float64),
+        "Market Capitalization": ("Market Capitalization", "f8", fr.read_float64),
+        "Market Open": ("Market Open", "b1", fr.read_is_market_open),
+        "Message Contents": ("Message Contents", "S9", lambda x: x),
+        # TODO: Parse:
+        "Most Recent Trade": ("Most Recent Trade", "f8", fr.read_float64),
+        "Most Recent Trade Aggressor": (
+            "Most Recent Trade Aggressor", "u1", fr.read_uint8
+        ),
+        "Most Recent Trade Conditions": (
+            "Most Recent Trade Conditions", "S16", lambda x: x
+        ),
+        # todo: Parse
+        "Most Recent Trade Date": (
+            "Most Recent Trade Date", "M8[D]", fr.read_mmddccyy
+        ),
+        "Most Recent Trade Day Code": (
+            "Most Recent Trade Day Code", "u1", fr.read_uint8
+        ),
+        "Most Recent Trade Market Center": (
+            "Most Recent Trade Market Center", "u1", fr.read_uint8
+        ),
+        "Most Recent Trade Size": ("Most Recent Trade Size", "u8", fr.read_uint64),
+        "Most Recent Trade Time": ("Most Recent Trade Time", "u8", fr.read_hhmmssus),
+        "Net Asset Value": ("Net Asset Value", "f8", fr.read_float64),
+        "Number of Trades Today": ("Number of Trades Today", "u8", fr.read_uint64),
+        "Open": ("Open", "f8", fr.read_float64),
+        "Open Interest": ("Open Interest", "u8", fr.read_uint64),
+        "Open Range 1": ("Open Range 1", "f8", fr.read_float64),
+        "Open Range 2": ("Open Range 2", "f8", fr.read_float64),
+        "Percent Change": ("Percent Change", "f8", fr.read_float64),
+        "Percent Off Average Volume": (
+            "Percent Off Average Volume", "f8", fr.read_float64
+        ),
+        "Previous Day Volume": ("Previous Day Volume", "u8", fr.read_uint64),
+        "Price-Earnings Ratio": ("Price-Earnings Ratio", "f8", fr.read_float64),
+        "Range": ("Range", "f8", fr.read_float64),
+        "Restricted Code": ("Restricted Code", "b1", fr.read_is_short_restricted),
+        "Settle": ("Settle", "f8", fr.read_float64),
+        "Settlement Date": ("Settlement Date", "M8[D]", fr.read_mmddccyy),
+        "Spread": ("Spread", "f8", fr.read_float64),
+        "Tick": ("Tick", "i1", fr.read_tick_direction),
+        "TickID": ("TickId", "u8", fr.read_uint64),
+        "Total Volume": ("Total Volume", "u8", fr.read_uint64),
+        "Volatility": ("Volatility", "f8", fr.read_float64),
+        "VWAP": ("VWAP", "f8", fr.read_float64),
+    }
 
     NewsMsg = namedtuple(
         "NewsMsg", (
-            "story_id", "distributor", "symbol_list",
-            "story_date", "story_time", "headline"))
+            "story_id",
+            "distributor",
+            "symbol_list",
+            "story_date",
+            "story_time",
+            "headline",
+        )
+    )
 
-    def __init__(self, name: str = "QuoteConn", host: str = FeedConn.host,
-                 port: int = port):
+    def __init__(
+        self,
+        name: str = "QuoteConn",
+        host: str = FeedConn.host,
+        port: int = port,
+    ):
         super().__init__(name, host, port)
         self._current_update_fields = []
         self._update_names = []
         self._update_dtype = []
         self._update_reader = []
         self._set_message_mappings()
-        self._current_update_fields = ["Symbol", "Most Recent Trade",
-                                       "Most Recent Trade Size",
-                                       "Most Recent Trade Time",
-                                       "Most Recent Trade Market Center",
-                                       "Total Volume", "Bid", "Bid Size",
-                                       "Ask",
-                                       "Ask Size", "Open", "High", "Low",
-                                       "Close", "Message Contents",
-                                       "Most Recent Trade Conditions"]
+        self._current_update_fields = [
+            "Symbol", 
+            "Most Recent Trade",
+            "Most Recent Trade Size",
+            "Most Recent Trade Time",
+            "Most Recent Trade Market Center",
+            "Total Volume", 
+            "Bid",
+            "Bid Size",
+            "Ask",
+            "Ask Size", 
+            "Open",
+            "High",
+            "Low",
+            "Close", 
+            "Message Contents",
+            "Most Recent Trade Conditions",
+        ]
         self._num_update_fields = len(self._current_update_fields)
         self._set_current_update_structs(self._current_update_fields)
 
@@ -850,62 +922,75 @@ class QuoteConn(FeedConn):
 
     def _process_fundamentals(self, fields: Sequence[str]):
         """Process a fundamental data message."""
-        assert len(fields) > 55
-        assert fields[0] == 'F'
+        assert len(fields) >= 58, "Incomplete fundamental message"
+        assert fields[0] == "F", "Incorrect message type"
         msg = self._empty_fundamental_msg
 
-        msg['Symbol'] = fields[1]
-        msg['PE'] = fr.read_float64(fields[3])
-        msg['Average Volume'] = fr.read_uint64(fields[4])
-        msg['52 Week High'] = fr.read_float64(fields[5])
-        msg['52 Week Low'] = fr.read_float64(fields[6])
-        msg['Calendar Year High'] = fr.read_float64(fields[7])
-        msg['Calendar Year Low'] = fr.read_float64(fields[8])
-        msg['Dividend Yield'] = fr.read_float64(fields[9])
-        msg['Dividend Amount'] = fr.read_float64(fields[10])
-        msg['Dividend Rate'] = fr.read_float64(fields[11])
-        msg['Pay Date'] = fr.read_mmddccyy(fields[12])
-        msg['Ex-dividend Date'] = fr.read_mmddccyy(fields[13])
-        msg['Short Interest'] = fr.read_uint64(fields[17])
-        msg['Current Year EPS'] = fr.read_float64(fields[19])
-        msg['Next Year EPS'] = fr.read_float64(fields[20])
-        msg['Five-year Growth Percentage'] = fr.read_float64(fields[21])
-        msg['Fiscal Year End'] = fr.read_uint8(fields[22])
-        msg['Company Name'] = fields[24]
-        msg['Root Option Symbol'] = fields[25]  # todo:Parse
-        msg['Percent Held By Institutions'] = fr.read_float64(fields[26])
-        msg['Beta'] = fr.read_float64(fields[27])
-        msg['Leaps'] = fields[28]  # todo: Parse
-        msg['Current Assets'] = fr.read_float64(fields[29])
-        msg['Current Liabilities'] = fr.read_float64(fields[30])
-        msg['Balance Sheet Date'] = fr.read_mmddccyy(fields[31])
-        msg['Long-term Debt'] = fr.read_float64(fields[32])
-        msg['Common Shares Outstanding'] = fr.read_float64(fields[33])
-        (fact, split_date) = fr.read_split_string(fields[35])
-        msg['Split Factor 1 Date'] = split_date
-        msg['Split Factor 1'] = fact
-        (fact, split_date) = fr.read_split_string(fields[36])
-        msg['Split Factor 2 Date'] = split_date
-        msg['Split Factor 2'] = fact
-        msg['Format Code'] = fr.read_uint8(fields[39])
-        msg['Precision'] = fr.read_uint8(fields[40])
-        msg['SIC'] = fr.read_uint64(fields[41])
-        msg['Historical Volatility'] = fr.read_float64(fields[42])
-        msg['Security Type'] = fr.read_int(fields[43])
-        msg['Listed Market'] = fr.read_uint8(fields[44])
-        msg['52 Week High Date'] = fr.read_mmddccyy(fields[45])
-        msg['52 Week Low Date'] = fr.read_mmddccyy(fields[46])
-        msg['Calendar Year High Date'] = fr.read_mmddccyy(fields[47])
-        msg['Calendar Year Low Date'] = fr.read_mmddccyy(fields[48])
-        msg['Year End Close'] = fr.read_float64(fields[49])
-        msg['Maturity Date'] = fr.read_mmddccyy(fields[50])
-        msg['Coupon Rate'] = fr.read_float64(fields[51])
-        msg['Expiration Date'] = fr.read_mmddccyy(fields[52])
-        msg['Strike Price'] = fr.read_float64(fields[53])
-        msg['NAICS'] = fr.read_uint8(fields[54])
-        msg['Exchange Root'] = fields[55]
-        msg['Option Premium Multiplier'] = fr.read_float64(fields[56])
-        msg['Option Multiple Deliverable'] = fr.read_uint8(fields[57])
+        msg["Symbol"] = fields[1]
+        msg["Exchange ID"] = fr.read_hex(fields[2])
+        msg["PE"] = fr.read_float64(fields[3])
+        msg["Average Volume"] = fr.read_uint64(fields[4])
+        msg["52 Week High"] = fr.read_float64(fields[5])
+        msg["52 Week Low"] = fr.read_float64(fields[6])
+        msg["Calendar Year High"] = fr.read_float64(fields[7])
+        msg["Calendar Year Low"] = fr.read_float64(fields[8])
+        msg["Dividend Yield"] = fr.read_float64(fields[9])
+        msg["Dividend Amount"] = fr.read_float64(fields[10])
+        msg["Dividend Rate"] = fr.read_float64(fields[11])
+        msg["Pay Date"] = fr.read_mmddccyy(fields[12])
+        msg["Ex-dividend Date"] = fr.read_mmddccyy(fields[13])
+        msg["Current Year EPS"] = fr.read_float64(fields[14])
+        msg["Next Year EPS"] = fr.read_float64(fields[15])
+        msg["Five-year Growth Percentage"] = fr.read_float64(fields[16])
+        msg["Fiscal Year End"] = fr.read_uint8(fields[17])
+        msg["Company Name"] = fields[18]
+        msg["Root Option Symbol"] = fields[19]  # todo:Parse
+        msg["Percent Held By Institutions"] = fr.read_float64(fields[20])
+        msg["Beta"] = fr.read_float64(fields[21])
+        msg["Leaps"] = fields[22]  # todo: Parse
+        msg["Current Assets"] = fr.read_float64(fields[23])
+        msg["Current Liabilities"] = fr.read_float64(fields[24])
+        msg["Balance Sheet Date"] = fr.read_mmddccyy(fields[25])
+        msg["Long-term Debt"] = fr.read_float64(fields[26])
+        msg["Common Shares Outstanding"] = fr.read_float64(fields[27])
+
+        (fact, split_date) = fr.read_split_string(fields[28])
+        msg["Split Factor 1 Date"] = split_date
+        msg["Split Factor 1"] = fact
+
+        (fact, split_date) = fr.read_split_string(fields[29])
+        msg["Split Factor 2 Date"] = split_date
+        msg["Split Factor 2"] = fact
+
+        msg["Format Code"] = fr.read_uint8(fields[30])
+        msg["Precision"] = fr.read_uint8(fields[31])
+        msg["SIC"] = fr.read_uint64(fields[32])
+        msg["Historical Volatility"] = fr.read_float64(fields[33])
+        msg["Security Type"] = fr.read_uint8(fields[34])
+        msg["Listed Market"] = fr.read_uint8(fields[35])
+        msg["52 Week High Date"] = fr.read_mmddccyy(fields[36])
+        msg["52 Week Low Date"] = fr.read_mmddccyy(fields[37])
+        msg["Calendar Year High Date"] = fr.read_mmddccyy(fields[38])
+        msg["Calendar Year Low Date"] = fr.read_mmddccyy(fields[39])
+        msg["Year End Close"] = fr.read_float64(fields[40])
+        msg["Maturity Date"] = fr.read_mmddccyy(fields[41])
+        msg["Coupon Rate"] = fr.read_float64(fields[42])
+        msg["Expiration Date"] = fr.read_mmddccyy(fields[43])
+        msg["Strike Price"] = fr.read_float64(fields[44])
+        msg["NAICS"] = fr.read_uint64(fields[45])
+        msg["Exchange Root"] = fields[46]
+        msg["Option Premium Multiplier"] = fr.read_float64(fields[47])
+        msg["Option Multiple Deliverable"] = fr.read_uint64(fields[48])
+        msg["Session Open Time"] = fr.read_hhmmss(fields[49])
+        msg["Session Close Time"] = fr.read_hhmmss(fields[50])
+        msg["Base Currency"] = fields[51]
+        msg["Contract Size"] = fr.read_uint64(fields[52])
+        msg["Contract Months"] = fields[53]
+        msg["Minimum Tick Size"] = fr.read_float64(fields[54])
+        msg["First Delivery Date"] = fr.read_mmddccyy(fields[55])
+        msg["FIGI"] = fields[56]
+        msg["Security SubType"] = fr.read_uint8(fields[57])
+
         for listener in self._listeners:
             listener.process_fundamentals(msg)
 
@@ -1659,43 +1744,55 @@ class HistoryConn(FeedConn):
     # Tick data is returned as a numpy array of this dtype. Note that
     # "tick-data" in IQFeed parlance means every trade with the latest top of
     # book quote at the time of the trade, NOT every quote and every trade.
-    tick_type = np.dtype([('tick_id', 'u8'),
-                          ('date', 'M8[D]'), ('time', 'm8[us]'),
-                          ('last', 'f8'), ('last_sz', 'u8'),
-                          ('last_type', 'S1'), ('mkt_ctr', 'u4'),
-                          ('tot_vlm', 'u8'), ('bid', 'f8'), ('ask', 'f8'),
-                          ('cond1', 'u1'), ('cond2', 'u1'), ('cond3', 'u1'),
-                          ('cond4', 'u1')])
-    tick_h5_type = np.dtype([('tick_id', 'u8'),
-                             ('date', 'i8'), ('time', 'i8'),
-                             ('last', 'f8'), ('last_sz', 'u8'),
-                             ('last_type', 'S1'), ('mkt_ctr', 'u4'),
-                             ('tot_vlm', 'u8'), ('bid', 'f8'), ('ask', 'f8'),
-                             ('cond1', 'u1'), ('cond2', 'u1'), ('cond3', 'u1'),
-                             ('cond4', 'u1')])
+    tick_type = np.dtype(
+        [
+            ("tick_id", "u8"),
+            ("date", "M8[D]"),
+            ("time", "m8[us]"),
+            ("last", "f8"),
+            ("last_sz", "u8"),
+            ("last_type", "S1"),
+            ("mkt_ctr", "u1"),
+            ("tot_vlm", "u8"),
+            ("bid", "f8"),
+            ("ask", "f8"),
+            ("cond1", "u1"),
+            ("cond2", "u1"),
+            ("cond3", "u1"),
+            ("cond4", "u1"),
+            ("aggressor", "u1"),
+            ("day_code", "u1"),
+        ]
+    )
 
     # Bar data is returned as a numpy array of this type.
-    bar_type = np.dtype([('date', 'M8[D]'), ('time', 'm8[us]'),
-                         ('open_p', 'f8'), ('high_p', 'f8'),
-                         ('low_p', 'f8'), ('close_p', 'f8'),
-                         ('tot_vlm', 'u8'), ('prd_vlm', 'u8'),
-                         ('num_trds', 'u8')])
-    bar_h5_type = np.dtype([('date', 'i8'), ('time', 'i8'),
-                            ('open_p', 'f8'), ('high_p', 'f8'),
-                            ('low_p', 'f8'), ('close_p', 'f8'),
-                            ('tot_vlm', 'u8'), ('prd_vlm', 'u8'),
-                            ('num_trds', 'u8')])
+    bar_type = np.dtype(
+        [
+            ("date", "M8[D]"),
+            ("time", "m8[us]"),
+            ("open_p", "f8"),
+            ("high_p", "f8"),
+            ("low_p", "f8"),
+            ("close_p", "f8"),
+            ("tot_vlm", "u8"),
+            ("prd_vlm", "u8"),
+            ("num_trds", "u8"),
+        ]
+    )
 
     # Daily data is returned as a numpy array of this type.
     # Daily data means daily, weekly, monthly and annual data.
     daily_type = np.dtype(
-            [('date', 'M8[D]'), ('open_p', 'f8'), ('high_p', 'f8'),
-             ('low_p', 'f8'), ('close_p', 'f8'), ('prd_vlm', 'u8'),
-             ('open_int', 'u8')])
-    daily_h5_type = np.dtype(
-            [('date', 'i8'), ('open_p', 'f8'), ('high_p', 'f8'),
-             ('low_p', 'f8'), ('close_p', 'f8'), ('prd_vlm', 'u8'),
-             ('open_int', 'u8')])
+        [
+            ("date", "M8[D]"),
+            ("open_p", "f8"),
+            ("high_p", "f8"),
+            ("low_p", "f8"),
+            ("close_p", "f8"),
+            ("prd_vlm", "u8"),
+            ("open_int", "u8"),
+        ]
+    )
 
     def __init__(self, name: str = "HistoryConn", host: str = FeedConn.host,
                  port: int = port):
@@ -1788,7 +1885,9 @@ class HistoryConn(FeedConn):
                 data[line_num]['ask'] = np.float64(dl[6])
                 data[line_num]['tick_id'] = np.uint64(dl[7])
                 data[line_num]['last_type'] = dl[8]
-                data[line_num]['mkt_ctr'] = np.uint32(dl[9])
+                data[line_num]['mkt_ctr'] = np.uint8(dl[9])
+                data[line_num]['aggressor'] = np.uint8(dl[11])
+                data[line_num]['day_code'] = np.uint8(dl[12])
 
                 cond_str = dl[10]
                 num_cond = len(cond_str) / 2
@@ -2190,26 +2289,36 @@ class HistoryConn(FeedConn):
                     assert line_num >= res.num_pts
             return data
 
-    def request_daily_data(self, ticker: str, num_days: int,
-                           ascend: bool = False, timeout: int = None):
+    def request_daily_data(
+        self,
+        ticker: str,
+        num_days: int,
+        ascend: bool = False,
+        include_partial: bool = True,
+        timeout: int = None,
+    ) -> np.ndarray:
         """
         Request daily bars for the previous num_days.
 
         :param ticker: Symbol
         :param num_days: Number of days. 1 means today only.
         :param ascend: True means oldest data first, False opposite.
+        :param include_partial: Whether the server should add to the response
+            a partial datapoint based on the current day's trading
+            up to the time the request is received by the server.
         :param timeout: Wait timeout seconds. Default None
         :return: A numpy array with dtype HistoryConn.daily_type
 
         HDX,[Symbol],[MaxDatapoints],[DataDirection],[RequestID],
-        [DatapointsPerSend]<CR><LF>
+        [DatapointsPerSend],[IncludePartialDatapoint]<CR><LF>
 
         """
         req_id = self._get_next_req_id()
         self._setup_request_data(req_id)
         pts_per_batch = min((100, num_days))
-        req_cmd = ("HDX,%s,%d,%d,%s,%d\r\n" % (
-            ticker, num_days, ascend, req_id, pts_per_batch))
+        req_cmd = "HDX,%s,%d,%d,%s,%d,%d\r\n" % (
+            ticker, num_days, ascend, req_id, pts_per_batch, include_partial
+        )
         self._send_cmd(req_cmd)
         self._req_event[req_id].wait(timeout=timeout)
         data = self._read_daily_data(req_id)
@@ -2225,11 +2334,16 @@ class HistoryConn(FeedConn):
         else:
             return data
 
-    def request_daily_data_for_dates(self, ticker: str, bgn_dt: datetime.date,
-                                     end_dt: datetime.date,
-                                     ascend: bool = False, max_days: int =
-                                     None,
-                                     timeout: int = None):
+    def request_daily_data_for_dates(
+        self,
+        ticker: str,
+        bgn_dt: datetime.date,
+        end_dt: datetime.date,
+        ascend: bool = False,
+        max_days: int = None,
+        include_partial: bool = True,
+        timeout: int = None
+    ) -> np.ndarray:
         """
         Request daily bars for a specific period.
 
@@ -2238,11 +2352,14 @@ class HistoryConn(FeedConn):
         :param end_dt: Latest DAte
         :param ascend: True means oldest data first, False opposite.
         :param max_days: Maximum number of days to get data for.
+        :param include_partial: Whether the server should add to the response
+            a partial datapoint based on the current day's trading
+            up to the time the request is received by the server.
         :param timeout: Wait timeout seconds. Default None
         :return: A numpy array with dtype HistoryConn.daily_type
 
         HDT,[Symbol],[BeginDate],[EndDate],[MaxDatapoints],[DataDirection],
-        [RequestID],[DatapointsPerSend]<CR><LF>
+        [RequestID],[DatapointsPerSend],[IncludePartialDatapoint]<CR><LF>
 
         """
         req_id = self._get_next_req_id()
@@ -2253,8 +2370,16 @@ class HistoryConn(FeedConn):
         pts_per_batch = 100
         if max_days is not None:
             pts_per_batch = min((100, max_days))
-        req_cmd = ("HDT,%s,%s,%s,%s,%d,%s,%d\r\n" % (
-            ticker, bgn_str, end_str, md_str, ascend, req_id, pts_per_batch))
+        req_cmd = "HDT,%s,%s,%s,%s,%d,%s,%d,%d\r\n" % (
+            ticker,
+            bgn_str,
+            end_str,
+            md_str,
+            ascend,
+            req_id,
+            pts_per_batch,
+            include_partial,
+        )
         self._send_cmd(req_cmd)
         self._req_event[req_id].wait(timeout=timeout)
         data = self._read_daily_data(req_id)
@@ -2270,26 +2395,36 @@ class HistoryConn(FeedConn):
         else:
             return data
 
-    def request_weekly_data(self, ticker: str, num_weeks: int,
-                            ascend: bool = False, timeout: int = None):
+    def request_weekly_data(
+        self,
+        ticker: str,
+        num_weeks: int,
+        ascend: bool = False,
+        include_partial: bool = True,
+        timeout: int = None
+    ) -> np.ndarray:
         """
         Request weekly bars for the last num_weeks.
 
         :param ticker: Symbol
         :param num_weeks: Number of weeks
         :param ascend: True means oldest data first, False opposite.
+        :param include_partial: Whether the server should add to the response
+            a partial datapoint based on the current day's trading
+            up to the time the request is received by the server.
         :param timeout: Wait timeout seconds. Default None
         :return: A numpy array with dtype HistoryConn.daily_type
 
         HWX,[Symbol],[MaxDatapoints],[DataDirection],[RequestID],
-        [DatapointsPerSend]<CR><LF>
+        [DatapointsPerSend],[IncludePartialDatapoint]<CR><LF>
 
         """
         req_id = self._get_next_req_id()
         self._setup_request_data(req_id)
         pts_per_batch = min((100, num_weeks))
-        req_cmd = ("HWX,%s,%d,%d,%s,%d\r\n" % (
-            ticker, num_weeks, ascend, req_id, pts_per_batch))
+        req_cmd = "HWX,%s,%d,%d,%s,%d,%d\r\n" % (
+            ticker, num_weeks, ascend, req_id, pts_per_batch, include_partial
+        )
         self._send_cmd(req_cmd)
         self._req_event[req_id].wait(timeout=timeout)
         data = self._read_daily_data(req_id)
@@ -2305,14 +2440,23 @@ class HistoryConn(FeedConn):
         else:
             return data
 
-    def request_monthly_data(self, ticker: str, num_months: int,
-                             ascend: bool = False, timeout: int = None):
+    def request_monthly_data(
+        self,
+        ticker: str,
+        num_months: int,
+        ascend: bool = False,
+        include_partial: bool = True,
+        timeout: int = None,
+    ) -> np.ndarray:
         """
         Request monthly bars for the last num_months.
 
         :param ticker: Symbol
         :param num_months: Number of months.
         :param ascend: True means oldest data first, False opposite.
+        :param include_partial: Whether the server should add to the response
+            a partial datapoint based on the current day's trading
+            up to the time the request is received by the server.
         :param timeout: Wait timeout seconds. Default None
         :return: A numpy array with dtype HistoryConn.daily_type
 
@@ -2323,8 +2467,9 @@ class HistoryConn(FeedConn):
         req_id = self._get_next_req_id()
         self._setup_request_data(req_id)
         pts_per_batch = min((100, num_months))
-        req_cmd = ("HMX,%s,%d,%d,%s,%d\r\n" % (
-            ticker, num_months, ascend, req_id, pts_per_batch))
+        req_cmd = "HMX,%s,%d,%d,%s,%d,%d\r\n" % (
+            ticker, num_months, ascend, req_id, pts_per_batch, include_partial
+        )
         self._send_cmd(req_cmd)
         self._req_event[req_id].wait(timeout=timeout)
         data = self._read_daily_data(req_id)
@@ -3014,6 +3159,7 @@ class LookupConn(FeedConn):
                                     filt_type: int = 0,
                                     filt_val_1: float = None,
                                     filt_val_2: float = None,
+                                    include_non_standard_options: bool = False,
                                     timeout: int = None) -> dict:
         """
         Request a chain of options on an equity.
@@ -3026,12 +3172,13 @@ class LookupConn(FeedConn):
         :param filt_type: 0=No filter 1=strike_range, 2=In/Out of money.
         :param filt_val_1: Lower strike or Num contracts in the money.
         :param filt_val_2: Upper string or Num Contracts out of the money.
+        :param include_non_standard_options: Includes non-standard options.
         :param timeout: Die after timeout secs, Default None.
         :return: List of Options tickers.
 
         CEO,[Symbol],[Puts/Calls],[Month Codes],[Near Months],
         [BinaryOptions],[Filter Type],[Filter Value One],[Filter Value Two],
-        [RequestID]<CR><LF>
+        [RequestID],[IncludeNonStandardOptions]<CR><LF>
 
         """
         assert (symbol is not None) and (symbol != '')
@@ -3065,10 +3212,12 @@ class LookupConn(FeedConn):
             assert filt_val_1 < filt_val_2
         req_id = self._get_next_req_id()
         self._setup_request_data(req_id)
-        req_cmd = "CEO,%s,%s,%s,%s,%d,%d,%s,%s,%s\r\n" % (
+        req_cmd = "CEO,%s,%s,%s,%s,%d,%d,%s,%s,%s,%d\r\n" % (
             symbol, opt_type, fr.blob_to_str(month_codes),
             fr.blob_to_str(near_months), include_binary, filt_type,
-            fr.blob_to_str(filt_val_1), fr.blob_to_str(filt_val_2), req_id)
+            fr.blob_to_str(filt_val_1), fr.blob_to_str(filt_val_2), req_id,
+            include_non_standard_options,
+        )
         self._send_cmd(req_cmd)
         self._req_event[req_id].wait(timeout=timeout)
         data = self._read_option_chain(req_id)
