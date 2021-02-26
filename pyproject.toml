@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyiqfeed"
-version = "0.10"
+version = "0.10.1"
 description = "Handles connections to IQFeed, the market data feed by DTN"
 authors = [
     "Ashwin Kapur <ashwin.kapur@gmail.com>",
@@ -10,7 +10,7 @@ license = "GPL-2.0"
 
 [tool.poetry.dependencies]
 python = "^3.7"
-numpy = "^1.20.1"
+numpy = "^1.18"
 
 [tool.poetry.dev-dependencies]
 isort = "^5.7.0"
