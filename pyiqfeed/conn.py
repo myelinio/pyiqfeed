@@ -54,7 +54,7 @@ import threading
 import time
 
 from collections import deque, namedtuple
-from typing import Sequence, List
+from typing import List, Optional, Sequence
 import xml.etree.ElementTree as ElementTree
 
 import numpy as np
@@ -4062,3 +4062,255 @@ class NewsConn(FeedConn):
                 err_msg = "Request: %s, Error: %s" % (req_cmd, str(xml_data[0]))
                 raise RuntimeError(err_msg)
         return self._create_story_counts(xml_data)
+
+
+class MarketSummaryConn(FeedConn):
+    """
+    MarketSummaryConn is used to request market summary data from IQFeed.
+
+    It lets you receive reports of 3 types:
+      - End of Day Summary
+      - Fundamental Summary
+      - 5 Minute Snapshot Summary
+    """
+
+    host = FeedConn.host
+    port = FeedConn.lookup_port
+
+    field_types = {
+        "PeRatio": "f8",
+        "AvgVolume": "f8",
+        "DivYield": "f8",
+        "DivAmount": "f8",
+        "DivRate": "f8",
+        "PayDate": "M8[D]",
+        "ExDivDate": "M8[D]",
+        "CurrentEps": "f8",
+        "EstEps": "f8",
+        "SIC": "u8",
+        "Precision": "u1",
+        "Display": "u8",
+        "GrowthPercent": "f8",
+        "FiscalYearEnd": "M8[D]",
+        "Volatility": "f8",
+        "ListedMarket": "u8",
+        "MaturityDate": "M8[D]",
+        "CouponRate": "f8",
+        "InstitutionalPercent": "f8",
+        "YearEndClose": "f8",
+        "Beta": "f8",
+        "Assets": "f8",
+        "Liabilities": "f8",
+        "LongTermDebt": "f8",
+        "CommonSharesOutstanding": "u8",
+        "MarketCap": "u8",
+        "52WeekHigh": "f8",
+        "52WeekHighDate": "M8[D]",
+        "52WeekLow": "f8",
+        "52WeekLowDate": "M8[D]",
+        "CalHigh": "f8",
+        "CalHighDate": "M8[D]",
+        "CalLow": "f8",
+        "CalLowDate": "M8[D]",
+        "LastSplit": "f8",
+        "LastSplitDate": "M8[D]",
+        "PrevSplit": "f8",
+        "PrevSplitDate": "M8[D]",
+        "NAICS": "u8",
+    }
+    field_readers = {
+        "PeRatio": fr.read_float64,
+        "AvgVolume": fr.read_float64,
+        "DivYield": fr.read_float64,
+        "DivAmount": fr.read_float64,
+        "DivRate": fr.read_float64,
+        "PayDate": fr.read_ccyymmdd,
+        "ExDivDate": fr.read_ccyymmdd,
+        "CurrentEps": fr.read_float64,
+        "EstEps": fr.read_float64,
+        "SIC": fr.read_uint64,
+        "Precision": fr.read_uint8,
+        "Display": fr.read_uint64,
+        "GrowthPercent": fr.read_float64,
+        "FiscalYearEnd": fr.read_ccyymmdd,
+        "Volatility": fr.read_float64,
+        "ListedMarket": fr.read_uint64,
+        "MaturityDate": fr.read_ccyymmdd,
+        "CouponRate": fr.read_float64,
+        "InstitutionalPercent": fr.read_float64,
+        "YearEndClose": fr.read_float64,
+        "Beta": fr.read_float64,
+        "Assets": fr.read_float64,
+        "Liabilities": fr.read_float64,
+        "LongTermDebt": fr.read_float64,
+        "CommonSharesOutstanding": fr.read_uint64,
+        "MarketCap": fr.read_uint64,
+        "52WeekHigh": fr.read_float64,
+        "52WeekHighDate": fr.read_ccyymmdd,
+        "52WeekLow": fr.read_float64,
+        "52WeekLowDate": fr.read_ccyymmdd,
+        "CalHigh": fr.read_float64,
+        "CalHighDate": fr.read_ccyymmdd,
+        "CalLow": fr.read_float64,
+        "CalLowDate": fr.read_ccyymmdd,
+        "LastSplit": fr.read_float64,
+        "LastSplitDate": fr.read_ccyymmdd,
+        "PrevSplit": fr.read_float64,
+        "PrevSplitDate": fr.read_ccyymmdd,
+        "NAICS": fr.read_uint64,
+    }
+
+    def __init__(
+        self,
+        name: str = "MarketSummaryConn",
+        host: str = FeedConn.host,
+        port: int = FeedConn.lookup_port,
+    ):
+        super().__init__(name, host, port)
+        self._set_message_mappings()
+        self._req_num = 0
+        self._req_buf = {}
+        self._req_numlines = {}
+        self._req_event = {}
+        self._req_failed = {}
+        self._req_err = {}
+        self._req_lock = threading.RLock()
+
+    def _set_message_mappings(self) -> None:
+        super()._set_message_mappings()
+        self._pf_dict["M"] = self._process_summary_datum
+
+    def _send_connect_message(self):
+        # The lookup/history socket does not accept connect messages
+        pass
+
+    def _process_summary_datum(self, fields: Sequence[str]) -> None:
+        req_id = fields[0]
+        if "E" == fields[1]:
+            # Error
+            self._req_failed[req_id] = True
+            err_msg = "Unknown Error"
+            if len(fields) > 2:
+                if fields[2] != "":
+                    err_msg = fields[2]
+            self._req_err[req_id] = err_msg
+        elif "!ENDMSG!" == fields[1]:
+            self._req_event[req_id].set()
+        else:
+            self._req_buf[req_id].append(fields)
+            self._req_numlines[req_id] += 1
+
+    def _get_next_req_id(self) -> str:
+        with self._req_lock:
+            req_id = "M_%.10d" % self._req_num
+            self._req_num += 1
+            return req_id
+
+    def _cleanup_request_data(self, req_id: str) -> None:
+        with self._req_lock:
+            del self._req_failed[req_id]
+            del self._req_err[req_id]
+            del self._req_buf[req_id]
+            del self._req_numlines[req_id]
+
+    def _setup_request_data(self, req_id: str) -> None:
+        with self._req_lock:
+            self._req_buf[req_id] = deque()
+            self._req_numlines[req_id] = 0
+            self._req_failed[req_id] = False
+            self._req_err[req_id] = ""
+            self._req_event[req_id] = threading.Event()
+
+    def _get_data_buf(self, req_id: str) -> FeedConn.databuf:
+        with self._req_lock:
+            buf = FeedConn.databuf(
+                failed=self._req_failed[req_id],
+                err_msg=self._req_err[req_id],
+                num_pts=self._req_numlines[req_id],
+                raw_data=self._req_buf[req_id],
+            )
+        self._cleanup_request_data(req_id)
+        return buf
+
+    def _create_dtype(self, field_names: List[str]) -> np.dtype:
+        return np.dtype(
+            [
+                (name, self.field_types.get(name, "S256"))
+                for name in field_names
+            ]
+        )
+
+    def _read_summary_data(self, req_id: str) -> np.array:
+        res = self._get_data_buf(req_id)
+        if res.failed:
+            return np.array([res.err_msg], dtype="object")
+        else:
+            # the first line contains names of the fields
+            record_qty = res.num_pts - 1
+            field_names = res.raw_data.popleft()
+            # the first item is a request id
+            field_names.pop(0)
+
+            dtype = self._create_dtype(field_names)
+            data = np.empty(record_qty, dtype)
+            line_num = 0
+            while res.raw_data and (line_num < record_qty):
+                line_data = res.raw_data.popleft()
+                try:
+                    for field_index, field_name in enumerate(field_names):
+                        value_index = field_index + 1
+                        value = line_data[value_index]
+                        if field_name in self.field_readers:
+                            value_reader = self.field_readers.get(field_name)
+                            value = value_reader(value)
+
+                        data[line_num][field_name] = value
+                except:
+                        # todo:
+                    #  consider how to handle cases when line contains invalid values
+                    pass
+
+                line_num += 1
+                if line_num >= record_qty:
+                    assert len(res.raw_data) == 0
+                if len(res.raw_data) == 0:
+                    assert line_num >= record_qty
+
+            return data
+
+    def get_fundamental_summary(
+        self,
+        security_type: int,
+        group_id: int,
+        date: datetime.date,
+        timeout: Optional[int] = None
+    ) -> np.array:
+        """
+        Retrieves a snapshot of fundamental data for all symbols in a Security Type
+        and Exchange Group.
+
+        :param security_type: a number representing the desired security type: futures,
+            equities, spots, etc... Values can be found using the instance of TableConn.
+        :param group_id: a number representing the desired exchange group: CBOT, NASDAQ,
+            NYSE, etc... Values can be found using the instance of TableConn.
+        :param date: the date of data being requested
+        :param timeout: Must return before timeout or die, Default None
+        :return: np.array
+
+        FDS,[Security Type],[Group ID],[Date],[RequestID]<CR><LF>
+        """
+        req_id = self._get_next_req_id()
+        self._setup_request_data(req_id)
+
+        date_str = fr.date_to_yyyymmdd(date)
+        req_cmd = "FDS,%d,%d,%s,%s\r\n" % (
+            security_type,
+            group_id,
+            date_str,
+            req_id,
+        )
+
+        self._send_cmd(req_cmd)
+        self._req_event[req_id].wait(timeout=timeout)
+        data = self._read_summary_data(req_id)
+        return data

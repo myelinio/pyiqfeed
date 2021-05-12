@@ -3,6 +3,7 @@
 
 from .conn import QuoteConn, AdminConn, HistoryConn, TableConn, LookupConn
 from .conn import BarConn, NewsConn
+from .conn import MarketSummaryConn
 from .conn import FeedConn
 
 from .connector import ConnConnector

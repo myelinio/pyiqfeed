@@ -173,7 +173,7 @@ def read_ccyymmdd(field: str) -> np.datetime64:
         day = int(field[6:8])
         return np.datetime64(datetime.date(year=year, month=month, day=day), "D")
     else:
-        return np.datetime64(datetime.date(year=1, month=1, day=1), "D")
+        return np.datetime64("NaT", "D")
 
 
 def read_timestamp_msg(dt_tm: str) -> Tuple[np.datetime64, int]:
