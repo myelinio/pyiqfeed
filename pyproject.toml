@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pyiqfeed"
-version = "0.10.1"
+version = "0.11"
 description = "Handles connections to IQFeed, the market data feed by DTN"
 authors = [
     "Ashwin Kapur <ashwin.kapur@gmail.com>",
