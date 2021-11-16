@@ -61,6 +61,9 @@ import numpy as np
 from .exceptions import NoDataError, UnexpectedField, UnexpectedMessage
 from .exceptions import UnexpectedProtocol, UnauthorizedError
 from . import field_readers as fr
+import logging
+
+logger = logging.getLogger()
 
 
 class FeedConn:
@@ -204,6 +207,10 @@ class FeedConn:
             if self._read_messages():
                 self._process_messages()
 
+    def event_set(self):
+        with self._start_lock:
+            self._stop.set()
+
     def _read_messages(self) -> bool:
         """Read raw text sent by IQFeed on socket"""
         ready_list = select.select([self._sock], [], [self._sock], 5)
@@ -212,10 +219,15 @@ class FeedConn:
                 "Error condition on socket connection to IQFeed: %s," "" % self.name()
             )
         if ready_list[0]:
-            data_recvd = self._sock.recv(1024).decode("latin-1")
-            with self._buf_lock:
-                self._recv_buf += data_recvd
-                return True
+            try:
+                data_recvd = self._sock.recv(1024).decode("latin-1")
+                with self._buf_lock:
+                    self._recv_buf += data_recvd
+                    return True
+            except ConnectionResetError as e:
+                self.event_set()
+                logger.error(f"Error condition on socket connection to IQFeed: {self.name()}, {e}")
+
         return False
 
     def _next_message(self) -> str:
