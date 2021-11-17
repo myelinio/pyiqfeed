@@ -221,6 +221,8 @@ class FeedConn:
         if ready_list[0]:
             try:
                 data_recvd = self._sock.recv(1024).decode("latin-1")
+                if data_recvd == '':
+                    raise ConnectionResetError("Connection reset by peer")
                 with self._buf_lock:
                     self._recv_buf += data_recvd
                     return True
