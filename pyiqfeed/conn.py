@@ -1955,11 +1955,11 @@ class HistoryConn(FeedConn):
                 data[line_num]["date"] = dt
                 data[line_num]["time"] = tm
                 data[line_num]["last"] = np.float64(dl[2])
-                data[line_num]["last_sz"] = np.uint64(dl[3])
-                data[line_num]["tot_vlm"] = np.uint64(dl[4])
+                data[line_num]["last_sz"] = int(dl[3])
+                data[line_num]["tot_vlm"] = int(dl[4])
                 data[line_num]["bid"] = np.float64(dl[5])
                 data[line_num]["ask"] = np.float64(dl[6])
-                data[line_num]["tick_id"] = np.uint64(dl[7])
+                data[line_num]["tick_id"] = int(dl[7])
                 data[line_num]["last_type"] = dl[8]
                 data[line_num]["mkt_ctr"] = np.uint8(dl[9])
                 data[line_num]["aggressor"] = np.uint8(dl[11])
@@ -2176,9 +2176,9 @@ class HistoryConn(FeedConn):
                 data[line_num]["low_p"] = np.float64(dl[3])
                 data[line_num]["open_p"] = np.float64(dl[4])
                 data[line_num]["close_p"] = np.float64(dl[5])
-                data[line_num]["tot_vlm"] = np.int64(dl[6])
-                data[line_num]["prd_vlm"] = np.int64(dl[7])
-                data[line_num]["num_trds"] = np.int64(dl[8])
+                data[line_num]["tot_vlm"] = int(dl[6])
+                data[line_num]["prd_vlm"] = int(dl[7])
+                data[line_num]["num_trds"] = int(dl[8])
                 line_num += 1
                 if line_num >= res.num_pts:
                     assert len(res.raw_data) == 0
