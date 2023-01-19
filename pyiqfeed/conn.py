@@ -3394,7 +3394,6 @@ class LookupConn(FeedConn):
         opt_type: str = "pc",
         month_codes: str = None,
         near_months: int = None,
-        include_binary: bool = True,
         filt_type: int = 0,
         filt_val_1: float = None,
         filt_val_2: float = None,
@@ -3408,7 +3407,6 @@ class LookupConn(FeedConn):
         :param opt_type: 'p'=Puts, 'c'=Calls, 'pc'=Both.
         :param month_codes: String of months you want.
         :param near_months: Number of near months (ignore months).
-        :param include_binary: Include binary options.
         :param filt_type: 0=No filter 1=strike_range, 2=In/Out of money.
         :param filt_val_1: Lower strike or Num contracts in the money.
         :param filt_val_2: Upper string or Num Contracts out of the money.
@@ -3452,12 +3450,11 @@ class LookupConn(FeedConn):
             assert filt_val_1 < filt_val_2
         req_id = self._get_next_req_id()
         self._setup_request_data(req_id)
-        req_cmd = "CEO,%s,%s,%s,%s,%d,%d,%s,%s,%s,%d\r\n" % (
+        req_cmd = "CEO,%s,%s,%s,%s,%d,%s,%s,%s,%d\r\n" % (
             symbol,
             opt_type,
             fr.blob_to_str(month_codes),
             fr.blob_to_str(near_months),
-            include_binary,
             filt_type,
             fr.blob_to_str(filt_val_1),
             fr.blob_to_str(filt_val_2),
